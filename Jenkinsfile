@@ -15,19 +15,6 @@ metadata:
   name: kaniko
 spec:
   containers:
-  -name: docker
-   env:
-   - name: DOCKER_HOST
-     value: 127.0.0.1
-     image: docker
-     command:
-     - cat:
-     tty: true
-  - name: tools
-    image: nekottyo/kustomize-kubeval
-    command:
-    - cat: 
-    tty: true
   - name: kubectl
     image: joshendriks/alpine-k8s
     command:
@@ -78,17 +65,6 @@ spec:
         //}
       //}
     //}
-      stage('Deploy qa') {
-      environment {
-        GIT_CREDS = credentials('github')
-      }
-      steps {
-        container('tools') {
-          sh "git clone https://$GIT_CREDS_USR:$GIT_CREDS_PSW@github.com/shtlamrut/argocd-demo.git"
-          sh "git config --global user.email shtlamrut@gmail.com"
-          sh "git config --global user.name shtlamrut"
-        }
-      }
-      }
+      
   }
 }
