@@ -6,7 +6,47 @@ pipeline {
 
   agent {
     kubernetes {
-      yamlFile 'builder.yaml'
+      yamlFile """
+ apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+  -name: docker
+   env:
+   - name: DOCKER_HOST
+     value: 127.0.0.1
+     image: docker
+     command:
+     - cat:
+     tty: true
+  - name: tools
+    image: nekottyo/kustomize-kubeval
+    command:
+    - cat: 
+    tty: true
+  - name: kubectl
+    image: joshendriks/alpine-k8s
+    command:
+    - /bin/cat
+    tty: true    
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: kaniko-secret
+        mountPath: /kaniko/.docker
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: regcred
+        items:
+          - key: .dockerconfigjson
+            path: config.json
+      """
     }
   }
 
